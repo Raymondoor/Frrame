@@ -11,7 +11,8 @@ A PHP application blueprint, not a framework you learn — a small directory con
 ## Getting started
 
 ```bash
-composer install
+composer create-project raymondoor/frrame <your-app-name>
+cd <your-app-name>
 npm install
 cp .env.sample .env   # then fill in your own values
 ```
