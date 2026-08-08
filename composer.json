@@ -1,5 +1,19 @@
 {
+    "name": "raymondoor/frrame",
+    "description": "A PHP application blueprint.",
+    "version": "1.0",
+    "type": "project",
+    "keywords": ["Frrame","framework"],
+    "time": "2026-08-08",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Raymondoor",
+            "email": "torhc17311@gmail.com"
+        }
+    ],
     "require": {
+        "php": ">=8.4",
         "vlucas/phpdotenv": "^5.6",
         "raymondoor/migrr": "^0.5.1",
         "monolog/monolog": "^3.10"
