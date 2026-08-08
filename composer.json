@@ -1,0 +1,30 @@
+{
+    "require": {
+        "vlucas/phpdotenv": "^5.6",
+        "raymondoor/migrr": "^0.5.1",
+        "monolog/monolog": "^3.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Frrame\\": "app/",
+            "Frrame\\Migration\\": "resource/migration/"
+        },
+        "files": [
+            "app/env.php",
+            "app/ini.php",
+            "app/def.php"
+        ]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "phpstan/phpstan": "^2.2",
+        "symfony/var-dumper": "^6.4",
+        "fakerphp/faker": "^1.24",
+        "guzzlehttp/guzzle": "^8.0"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Frrame\\Test\\Unit\\": "test/Unit/"
+        }
+    }
+}

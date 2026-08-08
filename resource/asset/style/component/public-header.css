@@ -1,0 +1,34 @@
+header{
+    background-color: var(--color-ac-2);
+    height: 3em;
+}
+header #headerContent{
+    height: 100%;
+    padding: 0 0.5em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+#headerLogo{
+    font-weight: bold;
+    font-size: 1.25em;
+    cursor: default;
+}
+#headerList{
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+#headerList li{
+    list-style: none;
+}
+#headerList li a{
+    display: flex;
+    padding: 0.5em;
+    text-decoration: none;
+    color: var(--color-ac-4);
+}
+#headerList li a:hover{
+    text-decoration: underline;
+    color: var(--color-ac-3);
+}

@@ -1,0 +1,26 @@
+{
+  "resource/asset/script/admin.js": {
+    "file": "assets/admin-Br-3gPvK.js",
+    "name": "admin",
+    "src": "resource/asset/script/admin.js",
+    "isEntry": true
+  },
+  "resource/asset/script/page/public/home.js": {
+    "file": "assets/home-CzMDAE4T.js",
+    "name": "home",
+    "src": "resource/asset/script/page/public/home.js",
+    "isDynamicEntry": true,
+    "css": [
+      "assets/home-BEcOxhB4.css"
+    ]
+  },
+  "resource/asset/script/public.js": {
+    "file": "assets/public-DRy8hTNb.js",
+    "name": "public",
+    "src": "resource/asset/script/public.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "resource/asset/script/page/public/home.js"
+    ]
+  }
+}

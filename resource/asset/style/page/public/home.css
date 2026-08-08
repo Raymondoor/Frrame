@@ -1,0 +1,19 @@
+@import "../../component/global.css";
+@import "../../component/screen.css";
+@import "../../component/public-header.css";
+
+main{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 3em);
+    background-color: var(--color-ac-1);
+}
+#welcomeCard{
+    background-color: var(--color-ac-3);
+    padding: 1em;
+    margin: 1em;
+    border-radius: 1em;
+    width: 24em;
+    text-wrap: pretty;
+}
