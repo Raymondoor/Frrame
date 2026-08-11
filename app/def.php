@@ -19,8 +19,8 @@ define('RESOURCE_PATH',realpath(ROOT_PATH.'/resource'));
 /**
  * @var string
  */
-define('HOME_URL',$_ENV['APP_PROTOCOL'].'://'.$_ENV['APP_DOMAIN'].$_ENV['APP_PORT'].$_ENV['APP_URI']);
+define('HOME_URL',$_ENV['APP_PROTOCOL'].'://'.$_ENV['APP_DOMAIN'].(!empty($_ENV['APP_PORT']) ? ':'.$_ENV['APP_PORT'] : '').$_ENV['APP_URI']);
 /**
  * @var string
  */
-define('IMAGE_URL',urlencode(HOME_URL.'/asset/image/'));
+define('IMAGE_URL',HOME_URL.'/asset/image/');
