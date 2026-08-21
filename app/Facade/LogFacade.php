@@ -25,9 +25,7 @@ class LogFacade{
             'context' => $this->context,
             'extra' => $this->extra
         ];
-        /** @todo adjust to loginfo table. */
         $stmt = DBstatement::run(
-            // INSERT INTO loginfo (timestamp, type, domainname, userid, result, message, yubikeyid)
             "INSERT INTO logs (channel, message, level, level_name, context, extra) VALUES (:channel, :message, :level, :level_name, :context, :extra)",
             [
                 ':channel' => $this->channel,

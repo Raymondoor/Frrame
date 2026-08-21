@@ -15,7 +15,7 @@ frrame/
 ├─ app/
 │  ├─ Base/                  # blueprint role
 │  │  ├─ Controller.php      #   abstract, static index(): void
-│  │  └─ Model.php           #   abstract, uninitialized static string $tablename
+│  │  └─ Model.php           #   abstract; $tablename + a small fluent query builder
 │  ├─ Component/             # independent-service role
 │  │  ├─ Http/
 │  │  │  ├─ RequestMethod.php   # static GET/POST/... checks against $_SERVER
@@ -86,9 +86,13 @@ frrame/
 
 Three files are loaded automatically as composer `files` autoload entries (see `composer.json`), always in this order, before anything else in `app/` runs:
 
-1. **`app/env.php`** — `Dotenv::createImmutable(ROOT_PATH)->load()`, populates `$_ENV` from `.env`.
-2. **`app/ini.php`** — runtime `ini_set`/global PHP config that depends on `$_ENV` (currently just the timezone).
-3. **`app/def.php`** — defines the path/URL constants every other file relies on: `ROOT_PATH`, `APP_PATH`, `PUBLIC_PATH`, `RESOURCE_PATH`, `HOME_URL`, `IMAGE_URL`.
+1. **`app/env.php`** — `Dotenv::createImmutable(ROOT_PATH)->load()`, populates `$_ENV` from `.env`, then `->required(['APP_PROD', 'APP_DEBUG'])->allowedValues(['0', '1'])` — a missing or non-`0`/`1` value for either fails loudly here rather than producing a confusing failure downstream.
+2. **`app/ini.php`** — sets the timezone, then branches on `$_ENV`:
+   - `APP_DEBUG=1` and `APP_PROD=0`: turns on `display_errors`/`display_startup_errors` and `error_reporting(E_ALL)`.
+   - `APP_PROD=1`: the opposite (errors hidden), plus a real error/exception handling setup — `set_error_handler()` promotes warnings/notices to thrown `ErrorException`s, and `set_exception_handler()` catches anything uncaught, discards buffered output (`ob_start()` earlier, `ob_end_clean()` here), writes a plaintext record to `log/error.log` via `error_log(..., 3, ...)`, and returns `500` (or `503` if writing the log itself failed).
+3. **`app/def.php`** — defines the path/URL constants every other file relies on: `ROOT_PATH`, `APP_PATH`, `PUBLIC_PATH`, `RESOURCE_PATH`, `HOME_URL`, `IMAGE_URL`. `HOME_URL` only appends `:$_ENV['APP_PORT']` when a port is actually set (`APP_PORT=` in `.env.sample` is meant to be left blank); `IMAGE_URL` is `HOME_URL.'/asset/image'`, no encoding applied to it.
+
+`app/ini.php`'s prod exception handler is this project's own opt-in answer to the "no global exception/error handler by default" note in `framework.md` — proof that adding one is exactly as unrestricted as that doc says, not evidence the framework ships one.
 
 Any entry point (`public/**/index.php`, `script/**/*.php`) only needs `require_once __DIR__.'/../vendor/autoload.php'` — Composer pulls those three in automatically, then psr-4 class autoloading (`Frrame\` → `app/`) takes over. This bootstrap-via-composer-`files` mechanism is this project's own choice, not a framework requirement.
 
@@ -158,7 +162,13 @@ class LogsModel extends Model{
     public static string $tablename = 'logs';
 }
 ```
-Nothing beyond that mapping — no query builder, no active-record methods. Querying still goes through `DBstatement` directly; a `Model` is currently just "a name for a table," and it's a project decision whether it ever grows beyond that.
+Beyond that mapping, `Base\Model` also carries a small fluent query builder, all of it routed through `DBstatement` rather than reimplementing PDO access:
+- `::all(bool $iamsure = false)` — every row, capped at 100 unless `$iamsure` says otherwise.
+- `::column_names()` — a driver-specific introspection query (`PRAGMA table_info` for sqlite, `INFORMATION_SCHEMA`/`information_schema.columns` for mysql/pgsql).
+- `::lastInserted()` — most recent row by `id DESC`.
+- `->select($columns)->where($pairs, $or)->orderby($columns)->limit($n, $offset)->run()` — builds `$this->query`/`$this->params` across chained calls (`select()` honors the `$columns` it's given), `run()` executes it via `DBstatement::select()`.
+
+This is genuinely a lightweight ORM now, not "just a name for a table."
 
 ### `app/Logic/`, `app/Factory/`, `app/Dictionary/`
 All three are currently empty except for a `README.md` stating their intended role (see `framework.md`'s Directory roles section) — nothing in this project has needed them yet.
@@ -184,7 +194,7 @@ Three directories under `test/`, split by *where the coverage came from* rather 
 
 `phpunit.xml` at the project root only lists the `unit` testsuite (`test/Unit`) — `test/Agent` and `test/User` are deliberately not PHPUnit suites, so neither is listed there. Run with `vendor/bin/phpunit`.
 
-## Known gaps / rough edges (accurate as of this writing)
+## Known gaps / rough edges
 
 - **`script/migration/up.php` doesn't actually run migrations.** It calls `$schema::up()`, which only *returns* the CREATE TABLE SQL string — nothing executes it (there's a `// exec()` comment marking this as unfinished). The `logs` table existing in `resource/data/database.db` right now happened some other way, not through this script. Fix by feeding the returned string to `DBstatement::exec()`.
 - `app/Component/Mail.php` is an empty stub — present as a named placeholder, not implemented.

@@ -23,4 +23,4 @@ define('HOME_URL',$_ENV['APP_PROTOCOL'].'://'.$_ENV['APP_DOMAIN'].(!empty($_ENV[
 /**
  * @var string
  */
-define('IMAGE_URL',HOME_URL.'/asset/image/');
+define('IMAGE_URL',HOME_URL.'/asset/image');
