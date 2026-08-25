@@ -1,6 +1,9 @@
 <?php declare(strict_types=1);
 namespace Frrame\Component;
 class ExceptionHandler{
+	/**
+	 * @todo [Raymondoor] pull `$_ENV` out of the scope.
+	 */
 	public static function setHandler():void{
 		if($_ENV['APP_DEBUG'] === '1' && $_ENV['APP_PROD'] === '0'){
 			ini_set('display_errors','1');

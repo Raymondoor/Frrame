@@ -23,6 +23,7 @@ frrame/
 │  │  │  ├─ RequestBody.php     # $_POST/$_FILES on POST; json/urlencoded via php://input on any method
 │  │  │  └─ ResponseHeader.php  # header()/redirect()/http_response_code() wrapper
 │  │  ├─ DBstatement.php     # static PDO wrapper (prepare/run/select/transactions)
+│  │  ├─ ExceptionHandler.php   # ::setHandler() - dev error display / prod error+exception logging
 │  │  ├─ Session.php         # $_SESSION wrapper designed to avoid session locking
 │  │  ├─ I18n.php            # loads resource/i18n/{namespace}/{locale}.php, t()
 │  │  └─ Mail.php            # empty stub — no mailer wired up yet
@@ -87,12 +88,8 @@ frrame/
 Three files are loaded automatically as composer `files` autoload entries (see `composer.json`), always in this order, before anything else in `app/` runs:
 
 1. **`app/env.php`** — `Dotenv::createImmutable(ROOT_PATH)->load()`, populates `$_ENV` from `.env`, then `->required(['APP_PROD', 'APP_DEBUG'])->allowedValues(['0', '1'])` — a missing or non-`0`/`1` value for either fails loudly here rather than producing a confusing failure downstream.
-2. **`app/ini.php`** — sets the timezone, then branches on `$_ENV`:
-   - `APP_DEBUG=1` and `APP_PROD=0`: turns on `display_errors`/`display_startup_errors` and `error_reporting(E_ALL)`.
-   - `APP_PROD=1`: the opposite (errors hidden), plus a real error/exception handling setup — `set_error_handler()` promotes warnings/notices to thrown `ErrorException`s, and `set_exception_handler()` catches anything uncaught, discards buffered output (`ob_start()` earlier, `ob_end_clean()` here), writes a plaintext record to `log/error.log` via `error_log(..., 3, ...)`, and returns `500` (or `503` if writing the log itself failed).
+2. **`app/ini.php`** — sets the timezone.
 3. **`app/def.php`** — defines the path/URL constants every other file relies on: `ROOT_PATH`, `APP_PATH`, `PUBLIC_PATH`, `RESOURCE_PATH`, `HOME_URL`, `IMAGE_URL`. `HOME_URL` only appends `:$_ENV['APP_PORT']` when a port is actually set (`APP_PORT=` in `.env.sample` is meant to be left blank); `IMAGE_URL` is `HOME_URL.'/asset/image'`, no encoding applied to it.
-
-`app/ini.php`'s prod exception handler is this project's own opt-in answer to the "no global exception/error handler by default" note in `framework.md` — proof that adding one is exactly as unrestricted as that doc says, not evidence the framework ships one.
 
 Any entry point (`public/**/index.php`, `script/**/*.php`) only needs `require_once __DIR__.'/../vendor/autoload.php'` — Composer pulls those three in automatically, then psr-4 class autoloading (`Frrame\` → `app/`) takes over. This bootstrap-via-composer-`files` mechanism is this project's own choice, not a framework requirement.
 
@@ -105,7 +102,7 @@ require_once __DIR__.'/../vendor/autoload.php';
 use \Frrame\Component\Http\RequestMethod;
 use Frrame\Controller\WelcomeController;
 use Frrame\Facade\MiddlewareFacade;
-MiddlewareFacade::web();
+MiddlewareFacade::web();  // ExceptionHandler + RequestHeader + RequestBody + Session
 if(RequestMethod::get()){
     WelcomeController::index();
 }else{
@@ -125,6 +122,9 @@ Four independent classes, each reading straight off PHP superglobals — none of
 - `RequestBody` — `::load()` fills `$form`/`$files` from `$_POST`/`$_FILES`, but only on POST — that's where PHP's own SAPI parsing (including file uploads) happens, and this class doesn't attempt to replicate it for other methods. `$json` (for `application/json`) and, on non-POST, `$form` (for urlencoded) are read straight from `php://input` instead, so those two body types work on `PUT`/`PATCH`/`DELETE` too. `::get()` reads across the merged `$raw`.
 - `ResponseHeader` — thin wrapper over `header()`, `header_remove()`, `http_response_code()`, plus a `redirect()` helper that prefixes `HOME_URL`.
 
+### `app/Component/ExceptionHandler.php`
+`::setHandler()` branches on `$_ENV`: with `APP_DEBUG=1` and `APP_PROD=0` it turns on `display_errors`/`display_startup_errors` and `error_reporting(E_ALL)`; with `APP_PROD=1` it does the opposite (errors hidden) and additionally installs a real error/exception setup — `set_error_handler()` promotes warnings/notices to thrown `ErrorException`s, and `set_exception_handler()` catches anything uncaught, discards buffered output, writes a plaintext record to `log/error.log` via `error_log(..., 3, ...)`, and returns `500` (or `503` if writing the log itself failed). Nothing calls this automatically — it only runs where something explicitly calls `ExceptionHandler::setHandler()` (currently `MiddlewareFacade::web()`).
+
 ### `app/Component/Session.php`
 Wraps `$_SESSION` with `start_safe()`/`close()` around every read/write specifically to avoid PHP's session-file locking blocking concurrent requests to the same visitor. Called today from `MiddlewareFacade::web()` — nothing at the framework level requires that, it's this project's own bootstrap choice (see the practical-vs-structural-independence note in `framework.md`).
 
@@ -142,6 +142,7 @@ Sit one layer above `Component`/`View` — they produce output or compose data r
 - `MiddlewareFacade` — **not a middleware pipeline** (no before/after hooks, no chain/onion, nothing route-aware) — just a named bundle of per-entry-point bootstrap calls. Currently one method, `::web()`, called from `public/index.php` before dispatch:
   ```php
   public static function web():void{
+      ExceptionHandler::setHandler();
       RequestHeader::load();
       RequestBody::load();
       Session::load();
