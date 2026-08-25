@@ -1,10 +1,13 @@
 <?php declare(strict_types=1);
 namespace Frrame\Controller;
 use Frrame\Base\Controller;
+use Frrame\Component\Http\RequestMethod;
+use Frrame\Component\Http\Request;
 use Frrame\Component\I18n;
 use Frrame\Facade\PageFacade;
 use Frrame\View\WebView;
 class WelcomeController extends Controller{
+	#[Request(route:'/',method:RequestMethod::GET,accept:'text/html')]
 	public static function index():void{
 		try{
 			I18n::load('common');
