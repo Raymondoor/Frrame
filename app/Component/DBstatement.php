@@ -62,7 +62,7 @@ class DBstatement{
      * @param array<int|string,mixed> $params
      * @return \Generator<int, array<string,mixed>>
      */
-    public static function select_unbuffered(string $query, array $params = []):\Generator{
+    public static function selectUnbuffered(string $query, array $params = []):\Generator{
         $statement = self::run($query,$params);
         while($data = $statement->fetch(\PDO::FETCH_ASSOC)){
             yield $data;

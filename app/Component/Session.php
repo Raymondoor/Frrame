@@ -31,7 +31,7 @@ final class Session{
     public static function get(string $key, mixed $default = null):mixed{
         return self::$cache[$key] ?? $default;
     }
-    public static function get_fresh(string $key, mixed $default = null):mixed{
+    public static function getFresh(string $key, mixed $default = null):mixed{
         self::start_safe();
         self::$cache = $_SESSION;
         $value = $_SESSION[$key] ?? $default;
