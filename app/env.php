@@ -7,4 +7,5 @@ try{
 }catch(\Throwable $t){
 	http_response_code(500);
 	echo 'Cannot load environment variables.';
+	exit(1);
 }
