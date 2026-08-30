@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 namespace Frrame\Component\Http;
 final readonly class RequestMethod{
-	public const GET = 'GET';
-	public const HEAD = 'HEAD';
-	public const POST = 'POST';
-	public const PUT = 'PUT';
-	public const DELETE = 'DELETE';
-	public const CONNECT = 'CONNECT';
-	public const OPTIONS = 'OPTIONS';
-	public const TRACE = 'TRACE';
-	public const PATCH = 'PATCH';
-	// public const QUERY = 'QUERY';
+	public const string GET = 'GET';
+	public const string HEAD = 'HEAD';
+	public const string POST = 'POST';
+	public const string PUT = 'PUT';
+	public const string DELETE = 'DELETE';
+	public const string CONNECT = 'CONNECT';
+	public const string OPTIONS = 'OPTIONS';
+	public const string TRACE = 'TRACE';
+	public const string PATCH = 'PATCH';
+	// public const string QUERY = 'QUERY';
 	public static function method():string{
 		return $_SERVER['REQUEST_METHOD'] ?? '';
 	}

@@ -17,8 +17,8 @@ class WelcomeController extends Controller{
 			$view = new WebView();
 			$view->set('page',$page)
 				->render('home.php');
-		}catch(\Throwable $t){
-			
+		}catch(\Throwable){
+			// logging
 		}
 	}
 }

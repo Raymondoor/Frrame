@@ -15,7 +15,6 @@ class RequestHeader{
      * @author Raymondoor <torhc17311@gmail.com> (Modifier)
      * @source https://packagist.org/packages/ralouphie/getallheaders
      * @license MIT
-     * @return void
      */
     public static function load():void{
         self::$headers = [];
@@ -25,7 +24,7 @@ class RequestHeader{
             'CONTENT_MD5'    => 'Content-Md5',
         ];
         foreach($_SERVER as $key => $value){
-            if(substr($key, 0, 5) === 'HTTP_'){
+            if(str_starts_with($key, 'HTTP_')){
                 $key = substr($key, 5);
                 if(!isset($copy_server[$key]) || !isset($_SERVER[$key])){
                     $key = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', $key))));
@@ -39,7 +38,7 @@ class RequestHeader{
             if(isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])){
                 self::$headers['Authorization'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
             } elseif(isset($_SERVER['PHP_AUTH_USER'])){
-                $basic_pass = isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
+                $basic_pass = $_SERVER['PHP_AUTH_PW'] ?? '';
                 self::$headers['Authorization'] = 'Basic '.base64_encode($_SERVER['PHP_AUTH_USER'].':'.$basic_pass);
             } elseif(isset($_SERVER['PHP_AUTH_DIGEST'])){
                 self::$headers['Authorization'] = $_SERVER['PHP_AUTH_DIGEST'];
@@ -51,9 +50,6 @@ class RequestHeader{
     }
     /**
      * same as `RequestHeader::get()`, with 'X-' prefixed.
-     * @param string $key
-     * @param mixed $default
-     * @return string|null
      */
     public static function getX(string $key, ?string $default = null):?string{
         return self::get('X-'.$key,$default);

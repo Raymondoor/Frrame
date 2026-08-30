@@ -3,9 +3,8 @@ namespace Frrame\View;
 class WebView{
     /** @var array<string,mixed> Readable in an included view as $this->{$key} via __get(). */
     public mixed $data = [];
-    public function __construct(){}
     /** @param string $key @param mixed $value */
-    public function set($key, $value):self{
+    public function set(string $key, mixed $value):self{
         $this->data[$key] = $value;
         return $this;
     }
@@ -13,24 +12,22 @@ class WebView{
      * Sets $key if unset, otherwise appends to it (expects $data[$key] to already be an array).
      * @param string $key @param mixed $value
      */
-    public function append($key, $value):self{
+    public function append(string $key, mixed $value):self{
         if(!isset($this->data[$key])){
             $this->data[$key] = $value;
             return $this;
         }
-        array_push($this->data[$key],$value);
+        $this->data[$key][] = $value;
         return $this;
     }
-    /** @param string $key */
-    public function __get($key):mixed{
+    public function __get(string $key):mixed{
         return $this->data[$key] ?? null;
     }
-    /** @param string $key */
-    public function __isset($key):bool{
+    public function __isset(string $key):bool{
         return isset($this->data[$key]);
     }
     /** @param string $file Path relative to resource/view/. */
-    public function render($file):void{
+    public function render(string $file):void{
         include(realpath(RESOURCE_PATH.'/view/'.$file));
     }
     /** @param string $file Path relative to resource/view/. */

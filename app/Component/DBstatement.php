@@ -27,7 +27,7 @@ class DBstatement{
 			//
 		}
 		elseif($driver === 'mysql'){
-			self::$connection->setAttribute(\PDO::MYSQL_ATTR_FOUND_ROWS,true);
+			self::$connection->setAttribute(\Pdo\Mysql::ATTR_FOUND_ROWS,true);
 		}// ...
 	}
 	private static function getConnection():\PDO{

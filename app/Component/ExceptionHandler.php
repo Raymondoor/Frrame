@@ -16,10 +16,10 @@ class ExceptionHandler{
 			ini_set('display_startup_errors','0');
 			error_reporting(0);
 			// Set warnings as Exception as well.
-			set_error_handler(function($errno, $errstr, $errfile, $errline){
+			set_error_handler(function($errno, $errstr, $errfile, $errline):void{
 				throw new \ErrorException($errstr, $errno, E_ALL, $errfile, $errline);
 			});
-			set_exception_handler(function($exception){
+			set_exception_handler(function($exception):void{
 				ob_end_clean();
 				$log = "--- ".date('Y-m-d H:i:s',)." Uncaught Error/Exception ---\n";
 				$log .= $exception::class." thrown in ".$exception->getFile()." : ".$exception->getLine()." : ".$exception->getMessage()."\n";

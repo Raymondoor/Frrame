@@ -11,7 +11,7 @@ abstract class Model{
     public static function all(bool $iamsure = false):array|bool{
         return DBstatement::select('SELECT * FROM '.static::$tablename.''.($iamsure ? '' : ' LIMIT 100'));
     }
-    public static function column_names(){
+    public static function column_names():array{
         if($_ENV['DB_DRVR']==='sqlite'){
             return DBstatement::select("PRAGMA table_info('".static::$tablename."')");
         }elseif($_ENV['DB_DRVR']==='mysql'){
@@ -19,10 +19,11 @@ abstract class Model{
         }elseif($_ENV['DB_DRVR']==='pgsql'){
             return DBstatement::select("SELECT * FROM information_schema.columns WHERE table_name = '".static::$tablename."'");
         }
+        return [];
     }
     public static function lastInserted(){
         $result = DBstatement::select('SELECT * FROM '.static::$tablename.' ORDER BY id DESC LIMIT 1');
-        return empty($result) ? $result : $result[0];
+        return $result === [] ? $result : $result[0];
     }
     public function select(array $columns = ['*']):self{
         $stmt = 'SELECT '.implode(', ',$columns).' FROM '.static::$tablename;
@@ -44,7 +45,7 @@ abstract class Model{
         return $this;
     }
     public function orderby(array $columns):self{
-        if(!empty($columns)){
+        if($columns !== []){
             $stmt = 'ORDER BY ';
             foreach($columns as $column => $d){
                 $direction = strtoupper($d) === 'D' || strtoupper($d) === 'DESC' ? 'DESC' : 'ASC';
@@ -58,10 +59,10 @@ abstract class Model{
     public function limit(int $limit = 0, int $offset = 0):self{
         $stmt = '';
         if($limit > 0){
-            $stmt .= ' LIMIT '.(string)$limit;
+            $stmt .= ' LIMIT '.$limit;
         }
         if($offset > 0){
-            $stmt .= ' OFFSET '.(string)$offset;
+            $stmt .= ' OFFSET '.$offset;
         }
         $this->query .= $stmt;
         return $this;

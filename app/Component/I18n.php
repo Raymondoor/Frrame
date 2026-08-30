@@ -47,7 +47,7 @@ class I18n{
         if(!is_string($value)){
             return $key;
         }
-        if(empty($context)){
+        if($context === []){
             return $value;
         }
         foreach($context as $contextKey => $contextValue){
