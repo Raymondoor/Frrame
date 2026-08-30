@@ -20,11 +20,11 @@ cp .env.sample .env   # then fill in your own values
 Point your webserver's docroot at `public/` (or somewhere else entirely — routing doesn't care). During development:
 
 ```bash
-npm run dev            # Vite dev server
+npx vite               # Vite dev server
 vendor/bin/phpunit     # test/Unit/
 ```
 
-For production, `npm run build` outputs to `public/dist/`.
+For production, `npx vite build` outputs to `public/dist/`.
 
 ## Directory structure
 
