@@ -1,6 +1,6 @@
-@import "../../component/global.css";
-@import "../../component/screen.css";
-@import "../../component/public-header.css";
+@import "../component/global.css";
+@import "../component/screen.css";
+@import "../component/public-header.css";
 
 main{
     display: flex;

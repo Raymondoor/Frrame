@@ -5,7 +5,7 @@ final class PageFacade{
 	public $page = [
 		'TITLE' => 'Title',
 		'INDEX' => 'index',
-		'ALIAS' => 'Index'
+		'ALIAS' => 'Alias'
 	];
 	/** @param array<string,mixed> $page */
 	public function __construct(array $page = []){
@@ -28,10 +28,16 @@ final class PageFacade{
 	public function indexAre(string $index=''):bool{
 		return str_starts_with($this->get('INDEX'), $index);
 	}
-	public function title(string $title = ''):string{
-		if(!empty($title)){
+	public function title(?string $title = null):string{
+		if(!is_null($title)){
 			$this->set(['TITLE' => $title]);
 		}
 		return $this->get('TITLE');
+	}
+	public function index(?string $index = null):string{
+		if(!is_null($index)){
+			$this->set(['INDEX' => $index]);
+		}
+		return $this->get('INDEX');
 	}
 }

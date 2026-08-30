@@ -1,1 +1,0 @@
-var e=window.INDEX,t=Object.assign({}),n=`./page/admin/${e}.js`;t[n]?t[n]():console.warn(`No page script found for: ${n}`);

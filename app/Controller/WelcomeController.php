@@ -14,9 +14,10 @@ class WelcomeController extends Controller{
 			I18n::load('public');
 			$page = new PageFacade();
 			$page->title(I18n::t('public.welcome.title',['name'=>$_ENV['APP_NAME']]));
+			$page->index('public-home');
 			$view = new WebView();
 			$view->set('page',$page)
-				->render('home.php');
+				->render('public/home.php');
 		}catch(\Throwable){
 			// logging
 		}

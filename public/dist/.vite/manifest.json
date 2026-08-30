@@ -1,26 +1,27 @@
 {
-  "resource/asset/script/admin.js": {
-    "file": "assets/admin-Br-3gPvK.js",
-    "name": "admin",
-    "src": "resource/asset/script/admin.js",
-    "isEntry": true
-  },
-  "resource/asset/script/page/public/home.js": {
-    "file": "assets/home-CzMDAE4T.js",
-    "name": "home",
-    "src": "resource/asset/script/page/public/home.js",
-    "isDynamicEntry": true,
-    "css": [
-      "assets/home-BEcOxhB4.css"
-    ]
-  },
-  "resource/asset/script/public.js": {
-    "file": "assets/public-DRy8hTNb.js",
-    "name": "public",
-    "src": "resource/asset/script/public.js",
+  "resource/asset/script/app.js": {
+    "file": "assets/app-DS_O9TZ8.js",
+    "name": "app",
+    "src": "resource/asset/script/app.js",
     "isEntry": true,
     "dynamicImports": [
-      "resource/asset/script/page/public/home.js"
+      "resource/asset/script/page/admin-home.js",
+      "resource/asset/script/page/public-home.js"
+    ]
+  },
+  "resource/asset/script/page/admin-home.js": {
+    "file": "assets/admin-home-CndOjE9K.js",
+    "name": "admin-home",
+    "src": "resource/asset/script/page/admin-home.js",
+    "isDynamicEntry": true
+  },
+  "resource/asset/script/page/public-home.js": {
+    "file": "assets/public-home-BFzfgnW-.js",
+    "name": "public-home",
+    "src": "resource/asset/script/page/public-home.js",
+    "isDynamicEntry": true,
+    "css": [
+      "assets/public-home-Dx5WXrYT.css"
     ]
   }
 }

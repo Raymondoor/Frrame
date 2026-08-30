@@ -1,4 +1,4 @@
-import "../../../style/page/public/home.css";
+import "../../style/page/public-home.css";
 
 import Alpine from 'alpinejs';
 

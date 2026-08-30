@@ -4,8 +4,8 @@ class AssetFacade{
 	public static function index(string $index):string{
 		return '<script>window.INDEX="'.$index.'";</script>'.PHP_EOL;
 	}
-	public static function viteEntry(string $entry):string{
-		$viteEntry = 'resource/asset/script/'.$entry.'.js';
+	public static function viteEntry():string{
+		$viteEntry = 'resource/asset/script/app.js';
 		if($_ENV['APP_PROD'] === '0'){
 			$devUrl = 'http://localhost:5173';
 			return <<<HTML

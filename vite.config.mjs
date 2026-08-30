@@ -10,8 +10,7 @@ export default defineConfig({
 		emptyOutDir: true,
 		rollupOptions: {
 			input: {
-				public: 'resource/asset/script/public.js',
-				admin: 'resource/asset/script/admin.js',
+				app: 'resource/asset/script/app.js',
 			},
 		},
 	},
@@ -22,9 +21,6 @@ export default defineConfig({
 		port: 5173,
 		hmr: {
 			overlay: false
-		},
-		watch: {
-			ignored: ['**/public/**'],
-		},
+		}
 	},
 });

@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
+use Rector\Config\RectorConfig;
 use Rector\CodingStyle\Rector\Catch_\CatchExceptionNameMatchingTypeRector;
 use Rector\CodingStyle\Rector\ClassLike\NewlineBetweenClassLikeStmtsRector;
 use Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector;
-use Rector\Config\RectorConfig;
 use Rector\EarlyReturn\Rector\If_\RemoveAlwaysElseRector;
 
 return RectorConfig::configure()
