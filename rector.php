@@ -21,7 +21,7 @@ return RectorConfig::configure()
         CatchExceptionNameMatchingTypeRector::class,
         RemoveAlwaysElseRector::class,
     ])
-    ->withPhpSets(php85:true)
+    ->withPhpSets(php84:true)
     ->withPreparedSets(
         codeQuality: true,
         codingStyle: true,
