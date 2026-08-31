@@ -15,9 +15,9 @@
     --color-stateWarning: #e5e28c;
     --color-stateOkay: #3fcf3c;
 
-    --color-anm: 240ms;
-    --color-anm-l: 480ms;
-    --color-anm-s: 120ms;
+    --animation-default: 240ms;
+    --animation-long: 480ms;
+    --animation-short: 120ms;
 }
 
 *::selection{

@@ -1,5 +1,17 @@
 .screen{
-    max-width:2880px;
+    max-width:1920px;
+    min-width:240px;
+    margin-left:auto;
+    margin-right:auto;
+}
+.screen2k{
+    max-width:2560px;
+    min-width:240px;
+    margin-left:auto;
+    margin-right:auto;
+}
+.screen4k{
+    max-width:3840px;
     min-width:240px;
     margin-left:auto;
     margin-right:auto;

@@ -1,11 +1,14 @@
 <?php declare(strict_types=1);
 namespace Frrame\Facade;
 class AssetFacade{
+	public static string $index = '';
 	public static function index(string $index):string{
+		self::$index = $index;
 		return '<script>window.INDEX="'.$index.'";</script>'.PHP_EOL;
 	}
 	public static function viteEntry():string{
 		$viteEntry = 'resource/asset/script/app.js';
+		$pageEntry = 'resource/asset/script/page/'.self::$index.'.js';
 		if($_ENV['APP_PROD'] === '0'){
 			$devUrl = 'http://localhost:5173';
 			return <<<HTML
@@ -27,6 +30,11 @@ class AssetFacade{
 		if(!empty($manifest[$viteEntry]['css'])){
 			foreach($manifest[$viteEntry]['css'] as $cssFile){
 				$html .= '<link rel="stylesheet" href="'.HOME_URL.'/dist/'.$cssFile.'">'.PHP_EOL;
+			}
+		}
+		if(!empty($manifest[$pageEntry]) && !empty($manifest[$pageEntry]['css'])){
+			foreach($manifest[$pageEntry]['css'] as $importcss){
+				$html .= '<link rel="stylesheet" href="'.HOME_URL.'/dist/'.$importcss.'">'.PHP_EOL;
 			}
 		}
 		return $html;
