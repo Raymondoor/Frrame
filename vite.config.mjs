@@ -15,9 +15,9 @@ export default defineConfig({
 		},
 	},
 	server: {
-		// Allows CORS requests from your local PHP server domain
 		cors: true,
 		strictPort: true,
+		origin: 'http://localhost:5173',
 		port: 5173,
 		hmr: {
 			overlay: false
