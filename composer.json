@@ -1,7 +1,7 @@
 {
     "name": "raymondoor/frrame",
     "description": "An application frame blueprint.",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "type": "project",
     "keywords": ["Frrame","framework"],
     "time": "2026-09-08",

@@ -10,7 +10,7 @@ use Frrame\Component\I18n;
     <div id="welcomeCard">
         <h1><?=$this->page->title()?></h1>
         <hr>
-        <p><?=I18n::t('public.welcome.desc')?></p>
+        <em><h3><?=I18n::t('public.welcome.desc')?></h3></em>
     </div>
 </main>
 </body>
