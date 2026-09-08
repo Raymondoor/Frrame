@@ -13,11 +13,11 @@ A PHP application blueprint, not a framework you learn — a small directory con
 ```bash
 composer create-project raymondoor/frrame <your-app-name>
 cd <your-app-name>
-npm install
+npm ci
 cp .env.sample .env   # then fill in your own values
 ```
 
-Point your webserver's docroot at `public/` (or somewhere else entirely — routing doesn't care). During development:
+Point your webserver's docroot at `/public` (or somewhere else entirely — routing doesn't care). No `npm run` scripts are configured — invoke the tools directly. During development:
 
 ```bash
 npx vite               # Vite dev server

@@ -8,18 +8,17 @@
 
 ```bash
 composer install
-npm install
+npm ci
 cp .env.sample .env   # then fill in your own values
 ```
 
-Point your webserver's docroot at `public/` (or somewhere else entirely — see Routing below).
+Point your webserver's docroot at `/public` (or somewhere else entirely — see Routing below). No `npm run` scripts are configured (`package.json` has none) — invoke the tools directly:
 
 ```bash
-npm run dev                        # Vite dev server (localhost:5173), used when APP_PROD=0
-npm run build                      # production build -> public/dist/
+npx vite                           # dev server (localhost:5173), used when APP_PROD=0
+npx vite build                     # production build -> public/dist/
 vendor/bin/phpunit                 # test/Unit/
 php script/migration/up.php        # create tables
-php script/seed/faker/logs.php     # seed `logs` with fake rows
 ```
 
 ## Directory map (current files)
