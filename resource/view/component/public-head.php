@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
-use Frrame\Facade\AssetFacade;
+use Frrame\View\Extension\ViteHandler;
 ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?=AssetFacade::index($this->page->index()).AssetFacade::viteEntry()?>
+    <?=ViteHandler::index($this->page->index()).ViteHandler::getEntry()?>
     <title><?=$this->page->title() ?? $_ENV['APP_NAME']?></title>
 </head>

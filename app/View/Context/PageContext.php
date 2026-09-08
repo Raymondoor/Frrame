@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
-namespace Frrame\Facade;
-final class PageFacade{
+namespace Frrame\View\Context;
+final class PageContext{
 	/** @var array<string,mixed> */
 	public $page = [
 		'TITLE' => 'Title',

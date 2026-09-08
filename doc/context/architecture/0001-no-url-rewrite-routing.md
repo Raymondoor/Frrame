@@ -21,7 +21,7 @@ Most PHP frameworks route every request through a single front controller, reach
 
 ## Decision Outcome
 
-Chosen option: "File-path-based routing" — `public/index.php` handles `/`, `public/foo/index.php` handles `/foo`, and so on, with no rewrite rule involved. See `agent/framework.md`'s Routing section for the full rule, including that the docroot itself doesn't have to be `public/` either.
+Chosen option: "File-path-based routing" — `public/index.php` handles `/`, `public/foo/index.php` handles `/foo`, and so on, with no rewrite rule involved. See `agent/structure/implementation.md`'s Routing section for the full rule, including that the docroot itself doesn't have to be `public/` either.
 
 ### Consequences
 

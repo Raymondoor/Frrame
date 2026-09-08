@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
-namespace Frrame\Facade;
-class AssetFacade{
+namespace Frrame\View\Extension;
+class ViteHandler{
 	public static string $index = '';
 	public static function index(string $index):string{
 		self::$index = $index;
 		return '<script>window.INDEX="'.$index.'";</script>'.PHP_EOL;
 	}
-	public static function viteEntry():string{
+	public static function getEntry():string{
 		$viteEntry = 'resource/asset/script/app.js';
 		$pageEntry = 'resource/asset/script/page/'.self::$index.'.js';
 		if($_ENV['APP_PROD'] === '0'){

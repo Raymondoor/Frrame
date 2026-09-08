@@ -16,9 +16,9 @@ Developers who want a PHP project to start from a small, readable directory conv
 
 ## Non-goals
 
-* Not a full-featured framework — no bundled ORM, DI container, or router. Nothing stops a project from adding one; Frrame just doesn't ship one by default. See `agent/framework.md`'s "The only real constraint" section.
+* Not a full-featured framework — no bundled ORM, DI container, or router. Nothing stops a project from adding one; Frrame just doesn't ship one by default. See `agent/structure/framework.md`'s "Why this exists" section.
 * Not opinionated about the tech stack beyond the PHP directory conventions themselves (dotenv/Monolog/Vite/Alpine/htmx in this repo are this project's own picks, not requirements).
 
 ## Current state
 
-Frrame itself is still a blueprint (see `agent/framework.md` and `agent/implementation.md`) — this repo has one working example route, not a shipped product feature set.
+Frrame itself is still a blueprint (see `agent/structure/framework.md` and `agent/structure/implementation.md`) — this repo has one working example route, not a shipped product feature set.

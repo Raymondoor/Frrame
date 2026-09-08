@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 namespace Frrame\View;
-class WebView{
+class HtmlPresenter{
     /** @var array<string,mixed> Readable in an included view as $this->{$key} via __get(). */
     public mixed $data = [];
     /** @param string $key @param mixed $value */
