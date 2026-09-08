@@ -1,240 +1,173 @@
-# Frrame — Reference Implementation (this repo, current state)
+# Frrame — Current Implementation
 
-> This is **not** the framework spec — that's [`framework.md`](framework.md), which describes roles and base directories only. This file documents the actual classes and files that currently exist in *this* repository: the creator's own recommended filling-in of those roles, useful as precedent to stay consistent with while working here. Delete, rename, or replace any of it and nothing in the framework itself breaks.
+This document describes how the current repository uses the Frrame structure.
 
-`WelcomeController` + `resource/view/page/public/home.php` is the one working example route in this repo, kept so the wiring can be seen end to end. When a real app gets built on top of this copy of Frrame, most of `app/Controller/`, `resource/view/`, `resource/i18n/` here will be replaced with that project's own.
+It is not a specification of Frrame. It records the concrete choices made in this repository so that an agent working on the repository can understand existing code without treating every choice as a requirement.
 
-## Getting started
+A different application may organize or implement the same concepts differently.
 
-```bash
-composer install
-npm ci
-cp .env.sample .env   # then fill in your own values
+## Top-level structure
+
+```text
+app/        PHP application code
+resource/   application resources
+script/     CLI and maintenance scripts
+doc/        project documentation
+log/        runtime logs
+test/       tests
+public/     current web document root
 ```
 
-Point your webserver's docroot at `/public` (or somewhere else entirely — see Routing below). No `npm run` scripts are configured (`package.json` has none) — invoke the tools directly:
+`public/` is used by this repository as the web document root. It is not a requirement for every Frrame application.
 
-```bash
-npx vite                           # dev server (localhost:5173), used when APP_PROD=0
-npx vite build                     # production build -> public/dist/
-vendor/bin/phpunit                 # test/Unit/
-php script/migration/up.php        # create tables
+## `app/`
+
+The current application uses the following subdirectories:
+
+```text
+app/
+├── Base/
+├── Component/
+├── Controller/
+├── Dictionary/
+├── Facade/
+├── Factory/
+├── Logic/
+├── Model/
+├── Util/
+└── View/
 ```
 
-## Directory map (current files)
+These represent the roles currently used by this repository.
 
-```
-frrame/
-├─ agent/
-│  ├─ AGENTS.md              # short, agent-facing rules — read first
-│  └─ structure/
-│     ├─ framework.md        # roles/base directories only — read before this file
-│     └─ implementation.md   # this file
-├─ app/
-│  ├─ Base/                  # blueprint role
-│  │  ├─ Controller.php      #   abstract, static index(): void
-│  │  └─ Model.php           #   abstract; $tablename + a small fluent query builder
-│  ├─ Component/             # independent-service role
-│  │  ├─ Http/
-│  │  │  ├─ Request.php         # #[Attribute] - route metadata (route/method/accept)
-│  │  │  ├─ RequestMethod.php   # GET/POST/... constants + matching ::get()/::post()/... checks
-│  │  │  ├─ RequestHeader.php   # loads + reads incoming headers
-│  │  │  ├─ RequestBody.php     # $_POST/$_FILES on POST; json/urlencoded via php://input on any method
-│  │  │  └─ ResponseHeader.php  # header()/redirect()/http_response_code() wrapper
-│  │  ├─ DBstatement.php     # static PDO wrapper (prepare/run/select/transactions)
-│  │  ├─ ExceptionHandler.php   # ::setHandler() - dev error display / prod error+exception logging
-│  │  ├─ Session.php         # $_SESSION wrapper designed to avoid session locking
-│  │  ├─ I18n.php            # loads resource/i18n/{namespace}/{locale}.php, t()
-│  │  └─ Mail.php            # empty stub — no mailer wired up yet
-│  ├─ Controller/            # blueprint-implementation role
-│  │  └─ WelcomeController.php  # extends Base\Controller — the one example route
-│  ├─ Dictionary/            # fixed-value-set role
-│  │  └─ README.md           #   nothing built yet
-│  ├─ Facade/                # glue/composition role
-│  │  ├─ LogFacade.php       # Monolog-Level-typed log record → DB or file
-│  │  └─ MiddlewareFacade.php   # per-entry-point bootstrap bundles, e.g. ::web()
-│  ├─ Factory/                # construction-helper role
-│  │  └─ README.md           #   nothing built yet
-│  ├─ Logic/                  # domain-process role
-│  │  └─ README.md           #   nothing built yet
-│  ├─ Model/                  # concrete-model role
-│  │  └─ LogsModel.php        #   extends Base\Model, $tablename = 'logs'
-│  ├─ Util/                  # self-contained-helper role
-│  │  └─ Str.php             # mb_* string helpers — one example helper, nothing more
-│  ├─ View/                  # view-rendering role
-│  │  ├─ Context/PageContext.php   # per-page metadata bag (title/index/alias)
-│  │  ├─ Extension/ViteHandler.php # Vite dev/manifest script+css tag output
-│  │  └─ HtmlPresenter.php   # ->set()/->render() include-based view, no compiling
-│  ├─ def.php                 # ROOT_PATH/APP_PATH/.../HOME_URL constants
-│  ├─ env.php                  # Dotenv::createImmutable()->load()
-│  └─ ini.php                  # date_default_timezone_set()
-├─ doc/
-│  ├─ context/
-│  │  ├─ architecture/        # MADR-format decision records
-│  │  ├─ implementation/      # feature-level "how it was built" notes
-│  │  └─ product/             # requirements / specs / "what and why"
-│  └─ image/                  # images doc/ files embed
-├─ log/
-│  └─ .gitignore               # `*` + `!.gitignore` — folder tracked, contents never are
-├─ public/
-│  ├─ index.php               # web root entry point — IS the "/" route
-│  ├─ api/index.php            # a second entry point — IS the "/api" route, just an example
-│  └─ dist/                    # Vite build output (manifest.json + hashed assets)
-├─ resource/
-│  ├─ asset/
-│  │  ├─ script/
-│  │  │  ├─ app.js             # single Vite entry - loads ./page/{window.INDEX}.js
-│  │  │  ├─ component/         # shared JS, mirrors style/component/ - empty, nothing to share yet
-│  │  │  └─ page/               # page/public-home.js, page/admin-home.js - flat, prefixed by area
-│  │  └─ style/                # component/, lib/, page/ - same shape as script/
-│  ├─ data/
-│  │  ├─ .gitignore            # same pattern as log/ — database.db never committed
-│  │  └─ database.db           # local sqlite file, gitignored
-│  ├─ i18n/{namespace}/{locale}.php   # returns a nested array, dot-key lookup
-│  ├─ migration/                # raymondoor/migrr schema definitions
-│  └─ view/
-│     ├─ component/             # shared partials (public-head.php, public-header.php)
-│     └─ page/public/home.php   # rendered by HtmlPresenter, area-prefixed like the JS/CSS
-├─ script/
-│  ├─ migration/up.php          # runs the migrations listed inline
-│  └─ seed/faker/logs.php       # fakerphp/faker-driven seeder for `logs`
-├─ test/
-│  ├─ Unit/                     # PHPUnit, PSR-4-autoloaded, hand-written, isolated
-│  ├─ Agent/                    # agent-written checks, not PHPUnit, no class required
-│  └─ User/                     # human-written checks, not PHPUnit either
-├─ composer.json / composer.lock
-├─ package.json / package-lock.json
-├─ phpunit.xml
-├─ rector.php                    # rector/rector, scoped to app/public/resource/test
-├─ vite.config.mjs
-└─ .env / .env.sample
+### `Base/`
+
+Base classes from which concrete application classes may inherit.
+
+For example:
+
+* `Base/Controller.php`
+* `Base/Model.php`
+
+These are conveniences of the current implementation rather than framework contracts.
+
+### `Controller/`
+
+Classes responsible for individual application entry-point behavior.
+
+The current repository contains `WelcomeController` as a small working example.
+
+### `Model/`
+
+Concrete classes representing application data.
+
+The current repository contains `LogsModel` as an example.
+
+### `Dictionary/`
+
+Fixed sets of values.
+
+This is useful for values that have a known, limited set of meanings, including values that would naturally be represented by PHP enums.
+
+A project may instead use native enums, constants, or another representation where appropriate.
+
+### `Component/`
+
+Independent reusable application components.
+
+The current repository contains components for concerns such as HTTP input, sessions, database access, internationalization, logging, and exception handling.
+
+Components are not required to follow the exact set used here.
+
+### `Facade/`
+
+Classes used to compose multiple application components for a particular purpose.
+
+For example, the current `MiddlewareFacade` groups the bootstrap operations used by web entry points.
+
+This is a composition choice of this repository, not a requirement to implement middleware or facades in a particular way.
+
+### `Factory/`
+
+Construction helpers.
+
+The directory currently contains no substantial implementation.
+
+### `Logic/`
+
+Application/domain processes that do not naturally belong to a more specific role.
+
+The directory currently contains no substantial implementation.
+
+### `Util/`
+
+Small self-contained utilities.
+
+The current repository contains `Str` for string-related helpers.
+
+### `View/`
+
+Code concerned with producing application output.
+
+The current repository contains the view presentation and page-context utilities used by its example application.
+
+## `resource/`
+
+The current repository uses:
+
+```text
+resource/
+├── asset/
+├── data/
+├── i18n/
+├── migration/
+└── view/
 ```
 
-## Bootstrap order
+These contain frontend source, application data, translations, database migration definitions, and views respectively.
 
-Three files are loaded automatically as composer `files` autoload entries (see `composer.json`), always in this order, before anything else in `app/` runs:
+Their exact organization is specific to this repository.
 
-1. **`app/env.php`** — `Dotenv::createImmutable(ROOT_PATH)->load()`, populates `$_ENV` from `.env`, then `->required(['APP_PROD', 'APP_DEBUG'])->allowedValues(['0', '1'])` — a missing or non-`0`/`1` value for either fails loudly here rather than producing a confusing failure downstream.
-2. **`app/ini.php`** — sets the timezone.
-3. **`app/def.php`** — defines the path/URL constants every other file relies on: `ROOT_PATH`, `APP_PATH`, `PUBLIC_PATH`, `RESOURCE_PATH`, `HOME_URL`, `IMAGE_URL`. `HOME_URL` only appends `:$_ENV['APP_PORT']` when a port is actually set (`APP_PORT=` in `.env.sample` is meant to be left blank); `IMAGE_URL` is `HOME_URL.'/asset/image'`, no encoding applied to it.
+## `script/`
 
-Any entry point (`public/**/index.php`, `script/**/*.php`) only needs `require_once __DIR__.'/../vendor/autoload.php'` — Composer pulls those three in automatically, then psr-4 class autoloading (`Frrame\` → `app/`) takes over. This bootstrap-via-composer-`files` mechanism is this project's own choice, not a framework requirement.
+Contains executable CLI scripts.
 
-## Routing
+The current repository uses this for database migration and seeding scripts.
 
-There is no router and no `.htaccess` rewrite rule anywhere in this repo: an `index.php` file's path, relative to wherever the webserver's docroot is pointed, is the route. `public/index.php` handles `/`; `public/api/index.php` (currently a placeholder) handles `/api`; a new `public/foo/index.php` would be `/foo`. Nothing about this requires a `public/` folder specifically — the docroot could point straight at the project root instead, with `index.php`/`api/index.php` dropped there, and nothing else about the framework changes. What a `public/` folder buys, by construction, is that `app/`, `resource/`, `script/`, `vendor/` simply aren't under the docroot; pointing the docroot at the project root instead means those become web-reachable paths unless the webserver config denies them explicitly.
+These scripts are intended to be invoked explicitly rather than through web requests.
 
-This is what lets the project run unmodified on hosting with zero rewrite config or docroot control — copy the files up and it works. It doesn't forbid the traditional style either: a `mod_rewrite`-driven router, a single dispatcher parsing `$_SERVER['REQUEST_URI']`, is entirely buildable on top by whoever wants it — nothing here is shipped by default, and nothing here stops it.
+## `public/`
 
-`public/index.php`:
+This repository currently uses `public/` as its document root.
 
-```php
-require_once __DIR__.'/../vendor/autoload.php';
-use \Frrame\Component\Http\RequestMethod;
-use Frrame\Controller\WelcomeController;
-use Frrame\Facade\MiddlewareFacade;
-MiddlewareFacade::web();  // ExceptionHandler + RequestHeader + RequestBody + Session
-if(RequestMethod::get()){
-    WelcomeController::index();
-}else{
-    http_response_code(404);
-    exit;
-}
+Each entry point is responsible for handling its own request and producing its output. There is no requirement in this repository for a separate router or URL-rewriting layer.
+
+For example:
+
+```text
+public/index.php
 ```
 
-Nothing requires an entry point to dispatch to a `Controller`, or to call `MiddlewareFacade` first — that's this file's own choice, followed because it reads cleanly. `WelcomeController::index()` also carries `#[Request(route: '/', method: RequestMethod::GET, accept: 'text/html')]` — `Component\Http\Request` is a PHP attribute, purely informational right now: nothing reads it via reflection to build a route table. It documents the route a method answers to, inline, without being a router.
+is the entry point for `/`, while:
 
-## Component tour
-
-### `app/Component/Http/*`
-- `Request` — a `#[\Attribute]`, not a runtime class: `route`/`method`/`accept` metadata a controller method can carry (see `WelcomeController::index()`). Nothing consumes it yet.
-- `RequestMethod` — `GET`/`HEAD`/`POST`/etc. string constants, plus matching static booleans (`::get()`, `::post()`, …) off `$_SERVER['REQUEST_METHOD']`.
-- `RequestHeader` — `::load()` populates a static array from `$_SERVER`/`getallheaders`-style parsing; `::get()`/`::is()`/`::contains()` read it.
-- `RequestBody` — `::load()` fills `$form`/`$files` from `$_POST`/`$_FILES`, but only on POST — that's where PHP's own SAPI parsing (including file uploads) happens, and this class doesn't attempt to replicate it for other methods. `$json` (for `application/json`) and, on non-POST, `$form` (for urlencoded) are read straight from `php://input` instead, so those two body types work on `PUT`/`PATCH`/`DELETE` too. `::get()` reads across the merged `$raw`. See `doc/context/implementation/request-body-parsing.md` for the fuller rationale.
-- `ResponseHeader` — thin wrapper over `header()`, `header_remove()`, `http_response_code()`, plus a `redirect()` helper that prefixes `HOME_URL`.
-
-### `app/Component/ExceptionHandler.php`
-`::setHandler()` branches on `$_ENV`: with `APP_DEBUG=1` and `APP_PROD=0` it turns on `display_errors`/`display_startup_errors` and `error_reporting(E_ALL)`; with `APP_PROD=1` it does the opposite (errors hidden) and additionally installs a real error/exception setup — `set_error_handler()` promotes warnings/notices to thrown `ErrorException`s, and `set_exception_handler()` catches anything uncaught, discards buffered output, writes a plaintext record to `log/error.log` via `error_log(..., 3, ...)`, and returns `500` (or `503` if writing the log itself failed). Nothing calls this automatically — it only runs where something explicitly calls `ExceptionHandler::setHandler()` (currently `MiddlewareFacade::web()`).
-
-### `app/Component/Session.php`
-Wraps `$_SESSION` with `start_safe()`/`close()` around every read/write specifically to avoid PHP's session-file locking blocking concurrent requests to the same visitor. Called today from `MiddlewareFacade::web()` — nothing at the framework level requires that, it's this project's own bootstrap choice.
-
-### `app/Component/DBstatement.php`
-A static PDO wrapper, connection built lazily from `DB_DRVR`/`DB_HOST`/`DB_NAME`/`DB_USER`/`DB_PASS`. When `DB_DRVR=sqlite` it always connects to `ROOT_PATH/resource/data/database.db` regardless of `DB_NAME`; that file is gitignored (see `resource/data/.gitignore`), so a fresh checkout won't have one until something creates it (opening a PDO sqlite connection to a non-existent file creates it empty — running the migration or seed script is enough).
-
-### `app/Component/I18n.php`
-`I18n::load('namespace')` includes `resource/i18n/{namespace}/{APP_LOCALE}.php` (must `return` a nested associative array) and merges it in. `I18n::t('namespace.some.key', ['placeholder' => $value])` does a dot-path lookup and `{placeholder}` interpolation (delimiters configurable via `setInterpolation`). Falls back to returning the key itself if not found — no exception, no missing-translation warning. `resource/i18n/admin/{en,ja}.php` exist as empty-but-valid namespace files (mirroring `public/`'s shape) for whenever an admin area needs them.
-
-## View tour
-
-### `app/View/Context/PageContext.php`
-A small mutable bag (`TITLE`/`INDEX`/`ALIAS` by default, extend freely via `->set()`) a controller fills in and a view reads. `->title()`/`->index()` both read-or-write depending on whether an argument is passed; `->indexIs()`/`->indexAre()` do exact/prefix matching against `INDEX` (`str_starts_with()` under the hood).
-
-### `app/View/Extension/ViteHandler.php`
-Emits `<script>` tags. In dev (`APP_PROD=0`) points at the Vite dev server (`localhost:5173`) directly; in prod, `::getEntry()` reads `public/dist/.vite/manifest.json` to resolve the single `app.js` entry's hashed filename plus its CSS, and additionally appends CSS for the current page-specific chunk (`resource/asset/script/page/{index}.js`, tracked via a static `$index` set by `::index()`) if the manifest has one.
-
-### `app/View/HtmlPresenter.php`
-Deliberately not a templating engine — `->render('page/public/home.php')` just `include`s a plain PHP file from `resource/view/`, with `$this` inside that file being the `HtmlPresenter` instance (`->set()` data readable as `$this->key` via `__get`). `->render()` can be called again from inside an included view to compose partials (see `resource/view/page/public/home.php` including `component/public-head.php`).
-
-## `app/Facade/*`
-
-- `LogFacade` — a Monolog-`Level`-typed value object; `->logToDB()` inserts into the `logs` table (see migration below), `->logToFile()` is an unimplemented stub.
-- `MiddlewareFacade` — **not a middleware pipeline** (no before/after hooks, no chain/onion, nothing route-aware) — just a named bundle of per-entry-point bootstrap calls. Currently one method, `::web()`, called from `public/index.php` before dispatch:
-  ```php
-  public static function web():void{
-      ExceptionHandler::setHandler();
-      RequestHeader::load();
-      RequestBody::load();
-      Session::load();
-  }
-  ```
-  The pattern to follow for other entry points: if `public/api/index.php` needs a different bootstrap set, add a sibling static method (`::api()`) rather than branching inside `::web()`. Each entry point still opts in explicitly by calling the method it wants — nothing auto-runs.
-
-## `app/Util/Str.php`
-mb_*-based `length()`/`lower()`/`upper()` helpers. One example of the self-contained-helper role — not a hint that a `Str` class specifically is expected.
-
-## `app/Base/Model.php` + `app/Model/LogsModel.php`
-The concrete-model convention this repo settled on: `Base\Model` declares an uninitialized `public static string $tablename;` (no default — reading it unset throws, which is what enforces "every concrete model sets its own"), and a concrete model just assigns it:
-```php
-class LogsModel extends Model{
-    public static string $tablename = 'logs';
-}
+```text
+public/api/index.php
 ```
-Beyond that mapping, `Base\Model` also carries a small fluent query builder, all of it routed through `DBstatement` rather than reimplementing PDO access:
-- `::all(bool $iamsure = false)` — every row, capped at 100 unless `$iamsure` says otherwise.
-- `::column_names()` — a driver-specific introspection query (`PRAGMA table_info` for sqlite, `INFORMATION_SCHEMA`/`information_schema.columns` for mysql/pgsql).
-- `::lastInserted()` — most recent row by `id DESC`.
-- `->select($columns)->where($pairs, $or)->orderby($columns)->limit($n, $offset)->run()` — builds `$this->query`/`$this->params` across chained calls, `run()` executes it via `DBstatement::select()`.
 
-This is genuinely a lightweight ORM now, not "just a name for a table."
+is an entry point for `/api`.
 
-## `app/Logic/`, `app/Factory/`, `app/Dictionary/`
-All three are currently empty except for a `README.md` stating their intended role — nothing in this project has needed them yet.
+This is the current implementation's routing arrangement.
 
-## Front-end (optional stack, currently: Vite + Alpine.js + htmx)
+## Dependencies and tooling
 
-`resource/asset/` is Vite's source root; `vite.config.mjs` builds a single entry, `resource/asset/script/app.js`, to `public/dist/` with a manifest. `app.js` does *convention-based* per-page code splitting off the `window.INDEX` value `ViteHandler::index()` prints (set from `PageContext`'s `INDEX`), via `import.meta.glob('./page/**/*.js')` — so adding `resource/asset/script/page/foo.js` auto-wires it to run only when `INDEX === 'foo'`, no registration needed. Page scripts/styles are named flat with an area prefix (`page/public-home.js`, `page/admin-home.js`) rather than nested in `public/`/`admin/` subfolders. `resource/asset/script/component/` (shared JS, mirrors `style/component/`) exists but is currently empty — nothing to share yet. `alpinejs` and `htmx.org` are `package.json` deps used by convention (see `page/public-home.js`), not framework requirements — swap or drop them per project.
+This repository currently uses Composer for PHP dependencies and Vite for frontend development and production builds.
 
-## i18n content
+These are development choices of this repository and are not part of the conceptual requirements of Frrame.
 
-`resource/i18n/{namespace}/{locale}.php` returns a plain nested array; `WelcomeController` loads a `common` and a `public` namespace as an example of composing more than one file per request. Locale comes from `$_ENV['APP_LOCALE']` unless passed explicitly to `I18n::load()`.
+## Working rule
 
-## Database, migrations & seeding
+When extending this repository, follow the existing implementation where it is useful and appropriate.
 
-Schema is defined with `raymondoor/migrr` (`resource/migration/*.php`, e.g. `CreateLogsTable`); `script/migration/up.php` is a plain array-driven runner (`php script/migration/up.php`) that feeds each schema's `::up()` SQL straight into `DBstatement::exec()`. `script/seed/faker/logs.php` follows the same plain-runner shape, using `fakerphp/faker` (a `require-dev` dependency) to insert 20 fake rows into `logs` via real `DBstatement::run()` calls, not fabricated output.
+Do not introduce a conventional framework structure merely because it is conventional.
 
-## Testing
-
-Three directories under `test/`, split by *where the coverage came from* rather than by what it tests:
-- `test/Unit/` — the only one of the three that's actually a PHPUnit suite. `TestCase` classes, namespaced `Frrame\Test\Unit\*`, mapped in `composer.json`'s `autoload-dev` (`"Frrame\\Test\\Unit\\": "test/Unit/"`). `StrTest.php` passes; `PageFacadeTest.php` currently references the removed `Frrame\Facade\PageFacade` class (see Known gaps).
-- `test/Agent/` — not PHPUnit, not autoloaded, no class required. `i18n-check.php` is a plain script (`php test/Agent/i18n-check.php`) that loads a real i18n file and checks the interpolated output, printing `OK`/`FAIL` and a matching exit code.
-- `test/User/` — same spirit as `test/Agent/` (plain script, no PHPUnit, no class needed), written by a human instead. `home-check.php` uses `guzzlehttp/guzzle` (`require-dev`) to `GET` the real `HOME_URL` and print the status + a body snippet — an actual live request against a running instance of the app, not a mock.
-
-`phpunit.xml` at the project root only lists the `unit` testsuite (`test/Unit`) — `test/Agent` and `test/User` are deliberately not PHPUnit suites, so neither is listed there.
-
-## Known gaps / rough edges
-
-- **`test/Unit/PageFacadeTest.php` references a removed class.** `use Frrame\Facade\PageFacade;` — that class is now `Frrame\View\Context\PageContext`. `vendor/bin/phpunit` fails on this file until it's updated to match.
-- `app/Component/Mail.php` is an empty stub — present as a named placeholder, not implemented.
-- `LogFacade::logToFile()` is a no-op stub (`return true;`) — only `logToDB()` actually does anything.
-- `public/dist/` (Vite build output) is currently untracked rather than gitignored — decide deliberately whether build artifacts should be committed for this project before assuming either way.
+At the same time, do not treat an existing directory, class, or implementation detail as immutable. The application may evolve when its requirements call for it.

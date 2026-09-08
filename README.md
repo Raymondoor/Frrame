@@ -1,43 +1,85 @@
 # Frrame
 
-A PHP application blueprint, not a framework you learn — a small directory convention you copy and then treat as your own code.
+A way of conceptualizing and organizing an application.
 
-## Philosophy
+Frrame is expressed as a directory structure and a set of conventions for understanding the roles of the things within it.
 
-- **Nothing is mandatory except a handful of top-level directories.** Sessions, HTTP headers, DB access, i18n — all optional, independent, swappable classes that live in your own `app/`, not hidden in a `vendor/` package.
-- **Routing never depends on URL-rewriting.** An entry file's path relative to wherever your webserver's docroot points *is* the route — no `mod_rewrite`, no `.htaccess`, no router required. If you don't control the webserver, this is what lets the project run unmodified anyway: copy the files up and it works.
-- **Everything else is free.** A router, DI container, ORM, global exception handler — none of it is off-limits, it's just not shipped by default.
+It is intentionally open. The structure is a starting point for an application, not a complete prescription for how an application must be implemented.
 
-## Getting started
+## Structure
+
+A typical Frrame project begins with:
+
+```text
+app/        application code
+
+resource/   application resources
+
+script/     executable scripts
+
+doc/        documentation
+
+log/        runtime logs
+```
+
+A project may add, remove, or reorganize parts of this structure as its requirements develop.
+
+The internal organization of `app/` and `resource/` is similarly open. Controllers, models, components, dictionaries, views, and other roles may be useful, but an application is not required to contain all of them.
+
+## What Frrame is
+
+Frrame is not a runtime or a collection of mandatory application components.
+
+There is no Frrame application object that everything must pass through, nor is there a prescribed implementation for concerns such as routing, persistence, sessions, authentication, or rendering.
+
+Those are decisions belonging to the application.
+
+Frrame instead provides a starting way to organize those decisions.
+
+## Starting a project
+
+The repository itself can be used as a starting point for a PHP application. Remove the example application code and replace it with the code belonging to the project being built.
+
+The current repository uses Composer, PHPUnit, Vite, and a `public/` document root. These are the choices of this repository and are not requirements of Frrame.
+
+## Documentation
+
+The `agent/structure/` directory contains two different kinds of information:
+
+* `concept.md` describes Frrame's intended scope and structure.
+* `implementation.md` describes the concrete implementation currently present in this repository.
+
+Keeping those separate is intentional.
+
+## Status
+
+Frrame is small by design.
+
+Its purpose is not to provide every tool an application might need, but to provide a coherent place in which an application can be built.
+
+## Getting Started
+
+To use this repository as a starting point:
 
 ```bash
-composer create-project raymondoor/frrame <your-app-name>
-cd <your-app-name>
-npm ci
-cp .env.sample .env   # then fill in your own values
+composer create-project raymondoor/frrame my-project
+cd my-project
 ```
 
-Point your webserver's docroot at `/public` (or somewhere else entirely — routing doesn't care). No `npm run` scripts are configured — invoke the tools directly. During development:
+Install the dependencies:
 
 ```bash
-npx vite               # Vite dev server
-vendor/bin/phpunit     # test/Unit/
+composer install
+npm install
 ```
 
-For production, `npx vite build` outputs to `public/dist/`.
+Copy `.env.sample` to `.env` and configure the application as needed.
 
-## Directory structure
+The repository's own development setup uses Vite and PHPUnit. Refer to `package.json` and `phpunit.xml` for the available commands and configuration.
 
+
+Run the development server:
+
+```bash
+npx vite
 ```
-app/       PHP application code (blueprints, controllers, models, ...)
-public/    webroot — every index.php here is a route
-resource/  views, i18n, front-end source, DB migrations
-script/    CLI scripts (migrations, seeders)
-doc/       human-facing project docs
-log/       runtime log output (gitignored)
-test/      Unit (PHPUnit), Agent/User (disposable checks)
-```
-
-## Learn more
-
-See [`doc/context/`](doc/context/) for architecture decisions, implementation notes, and product context.
